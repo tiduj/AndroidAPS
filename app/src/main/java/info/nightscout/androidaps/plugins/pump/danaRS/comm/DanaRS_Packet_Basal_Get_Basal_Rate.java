@@ -6,9 +6,12 @@ import com.cozmo.danar.util.BleCommandUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+
 import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.logging.L;
+import info.nightscout.androidaps.plugins.bus.RxBus;
 import info.nightscout.androidaps.plugins.general.overview.events.EventDismissNotification;
 import info.nightscout.androidaps.plugins.general.overview.events.EventNewNotification;
 import info.nightscout.androidaps.plugins.general.overview.notifications.Notification;
@@ -49,15 +52,15 @@ public class DanaRS_Packet_Basal_Get_Basal_Rate extends DanaRS_Packet {
 			log.debug("Max basal: " + pump.maxBasal + " U");
 			log.debug("Basal step: " + pump.basalStep + " U");
 			for (int index = 0; index < 24; index++)
-				log.debug("Basal " + String.format("%02d", index) + "h: " + pump.pumpProfiles[pump.activeProfile][index]);
+				log.debug("Basal " + String.format(Locale.ENGLISH, "%02d", index) + "h: " + pump.pumpProfiles[pump.activeProfile][index]);
 		}
 
 		if (pump.basalStep != 0.01d) {
 		    failed = true;
 			Notification notification = new Notification(Notification.WRONGBASALSTEP, MainApp.gs(R.string.danar_setbasalstep001), Notification.URGENT);
-			MainApp.bus().post(new EventNewNotification(notification));
+			RxBus.INSTANCE.send(new EventNewNotification(notification));
 		} else {
-			MainApp.bus().post(new EventDismissNotification(Notification.WRONGBASALSTEP));
+			RxBus.INSTANCE.send(new EventDismissNotification(Notification.WRONGBASALSTEP));
 		}
 
 	}
